@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:living_check/face_painter.dart';
+import 'package:living_check/util/face_painter.dart';
 import 'package:living_check/mlkit_camera_preview.dart';
 
 enum TypeDetection { text, faces }
