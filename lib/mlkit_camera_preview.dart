@@ -38,9 +38,7 @@ class _MLKitCamerapreviewState extends State<MLKitCameraPreview> {
 
   @override
   void dispose() {
-    controller?.stopImageStream();
-    controller?.dispose();
-    controller = null;
+    _disposeController();
     super.dispose();
   }
 
@@ -63,7 +61,7 @@ class _MLKitCamerapreviewState extends State<MLKitCameraPreview> {
       cameraSelected = cameras.firstWhere(
         (element) => element.lensDirection == widget.cameraLensDirection,
       );
-    // ignore: empty_catches
+      // ignore: empty_catches
     } catch (e) {}
     if (cameraSelected != null) {
       controller = CameraController(cameraSelected!, ResolutionPreset.max);
@@ -165,6 +163,12 @@ class _MLKitCamerapreviewState extends State<MLKitCameraPreview> {
         ),
       ),
     );
+  }
+
+  void _disposeController() async {
+    await controller?.stopImageStream();
+    await controller?.dispose();
+    controller = null;
   }
 }
 
