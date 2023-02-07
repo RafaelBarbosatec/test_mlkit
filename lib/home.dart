@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:living_check/util/face_painter.dart';
 import 'package:living_check/mlkit_camera_preview.dart';
+import 'package:living_check/util/face_painter.dart';
 
 enum TypeDetection { text, faces }
 
@@ -23,13 +23,14 @@ class _HomePageState extends State<HomePage> {
     ),
   );
 
-  final textRecognizer = TextRecognizer();
+  final _textRecognizer = TextRecognizer();
 
   TypeDetection typeDetection = TypeDetection.text;
 
   @override
   void dispose() {
     _faceDetector.close();
+    _textRecognizer.close();
     super.dispose();
   }
 
@@ -120,10 +121,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future _processText(InputImage inputImage) async {
-    RecognizedText recognisedText = await textRecognizer.processImage(
+    RecognizedText recognisedText = await _textRecognizer.processImage(
       inputImage,
     );
-    await textRecognizer.close();
     scannedText = "";
     for (TextBlock block in recognisedText.blocks) {
       for (TextLine line in block.lines) {
