@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:living_check/home.dart';
+import 'package:living_check/pages/face_scan.dart';
+import 'package:living_check/pages/home.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +18,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
+      routes: {
+        '/': (context) => const HomePage(),
+        '/face': (context) => const FaceScanPage(),
+      },
     );
   }
 }

@@ -3,17 +3,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 
-typedef AsyncInputImageCallback = Future<void> Function(InputImage image);
+typedef AsyncInputImageCallback = Future<void> Function(InputImage image,CameraImage camImg);
 
 class MLKitCameraPreview extends StatefulWidget {
   final AsyncInputImageCallback imageCallback;
   final Duration interval;
   final CameraLensDirection cameraLensDirection;
+  final ValueChanged<Size>? onStart;
   const MLKitCameraPreview({
     super.key,
     this.interval = const Duration(seconds: 1),
     required this.imageCallback,
     this.cameraLensDirection = CameraLensDirection.back,
+    this.onStart,
   });
 
   @override
@@ -74,6 +76,7 @@ class _MLKitCamerapreviewState extends State<MLKitCameraPreview> {
           cameraInitializaded = true;
         });
         _initImageStream(cameraSelected!);
+        widget.onStart?.call(controller?.value.previewSize ?? Size.zero);
       }).catchError((Object e) {
         if (e is CameraException) {
           switch (e.code) {
@@ -102,7 +105,7 @@ class _MLKitCamerapreviewState extends State<MLKitCameraPreview> {
       processingImage = true;
       var inputImage = _getInputImage(image, camera);
       if (inputImage != null) {
-        await widget.imageCallback(inputImage);
+        await widget.imageCallback(inputImage,image);
       }
       await Future.delayed(widget.interval);
       processingImage = false;
