@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:living_check/util/face_frame_painter.dart';
 import 'package:living_check/util/image_converter.dart';
 import 'package:living_check/widgets/mlkit_camera_preview.dart';
 
@@ -36,7 +37,8 @@ class _FaceScanPageState extends State<FaceScanPage> {
   double faceFrameSize = 0;
   double faceSizeAccepeted = 400;
   double faceMaxSizeAccepeted = 400;
-  Rect centerRect = Rect.zero;
+  Rect centerPositionFaceRect = Rect.zero;
+  Rect frameFaceRect = Rect.zero;
 
   Uint8List? _normalface;
   Uint8List? _smilerface;
@@ -76,7 +78,7 @@ class _FaceScanPageState extends State<FaceScanPage> {
                     constrant.maxWidth,
                   );
                   faceFrameSize = minScreenSize * 0.6;
-                  centerRect = Rect.fromCenter(
+                  centerPositionFaceRect = Rect.fromCenter(
                     center: Offset(
                       minSize / 2,
                       maxSize / 2,
@@ -84,39 +86,60 @@ class _FaceScanPageState extends State<FaceScanPage> {
                     width: faceSizeAccepeted / 2,
                     height: faceSizeAccepeted / 2,
                   );
+
+                  frameFaceRect = Rect.fromCenter(
+                    center: Offset(
+                      constrant.maxWidth / 2,
+                      constrant.maxHeight / 2,
+                    ),
+                    width: faceFrameSize,
+                    height: faceFrameSize * 1.4,
+                  );
                 });
               },
+            ),
+
+            CustomPaint(
+              painter: FaceFramePainter(
+                frameFaceRect,
+                BorderRadius.circular(faceFrameSize),
+              ),
             ),
             Align(
               alignment: Alignment.topCenter,
               child: Container(
-                margin: const EdgeInsets.all(16),
+                margin: const EdgeInsets.only(),
                 padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(20),
-                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
                     ),
-                    Text(description),
+                    Text(
+                      description,
+                      style: const TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-            Center(
-              child: Container(
-                width: faceFrameSize,
-                height: faceFrameSize * 1.4,
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.red),
-                    borderRadius: BorderRadius.circular(faceFrameSize)),
-              ),
-            ),
+            // Center(
+            //   child: Container(
+            //     width: faceFrameSize,
+            //     height: faceFrameSize * 1.4,
+            //     decoration: BoxDecoration(
+            //         border: Border.all(color: Colors.red),
+            //         borderRadius: BorderRadius.circular(faceFrameSize)),
+            //   ),
+            // ),
             // if (_customPaint != null) _customPaint!,
             // Align(
             //   alignment: Alignment.bottomCenter,
@@ -140,8 +163,9 @@ class _FaceScanPageState extends State<FaceScanPage> {
             // ),
             Align(
               alignment: Alignment.bottomCenter,
-              child: SizedBox(
+              child: Container(
                 height: 100,
+                margin: const EdgeInsets.only(bottom: 100),
                 child: Row(
                   children: [
                     if (_normalface != null)
@@ -200,7 +224,7 @@ class _FaceScanPageState extends State<FaceScanPage> {
           distanceOk = true;
         }
 
-        if (centerRect.contains(face.boundingBox.center)) {
+        if (centerPositionFaceRect.contains(face.boundingBox.center)) {
           centerOk = true;
         }
 
