@@ -1,9 +1,11 @@
 import 'dart:math';
 
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:living_check/util/image_converter.dart';
 import 'package:living_check/widgets/mlkit_camera_preview.dart';
 
 enum TypeDetection { text, faces }
@@ -17,6 +19,8 @@ class FaceScanPage extends StatefulWidget {
 
 class _FaceScanPageState extends State<FaceScanPage> {
   String scannedText = "";
+  String title = 'Escaneando rosto';
+  String description = '';
   CustomPaint? _customPaint;
   final FaceDetector _faceDetector = FaceDetector(
     options: FaceDetectorOptions(
@@ -34,7 +38,10 @@ class _FaceScanPageState extends State<FaceScanPage> {
   double faceMaxSizeAccepeted = 400;
   Rect centerRect = Rect.zero;
 
-  CameraImage? lastSelected;
+  Uint8List? _normalface;
+  Uint8List? _smilerface;
+
+  bool allImagesCapturated = false;
 
   @override
   void dispose() {
@@ -89,7 +96,16 @@ class _FaceScanPageState extends State<FaceScanPage> {
                   color: Colors.white.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Text(_getTitle()),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(description),
+                  ],
+                ),
               ),
             ),
             Center(
@@ -101,68 +117,47 @@ class _FaceScanPageState extends State<FaceScanPage> {
                     borderRadius: BorderRadius.circular(faceFrameSize)),
               ),
             ),
-            if (_customPaint != null) _customPaint!,
+            // if (_customPaint != null) _customPaint!,
+            // Align(
+            //   alignment: Alignment.bottomCenter,
+            //   child: Column(
+            //     mainAxisSize: MainAxisSize.min,
+            //     children: [
+            //       if (scannedText.isNotEmpty)
+            //         Container(
+            //           padding: const EdgeInsets.all(16),
+            //           decoration: BoxDecoration(
+            //             color: Colors.white.withOpacity(0.5),
+            //             borderRadius: BorderRadius.circular(20),
+            //           ),
+            //           child: Text(
+            //             scannedText,
+            //             style: const TextStyle(fontSize: 20),
+            //           ),
+            //         ),
+            //     ],
+            //   ),
+            // ),
             Align(
               alignment: Alignment.bottomCenter,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (scannedText.isNotEmpty)
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(20),
+              child: SizedBox(
+                height: 100,
+                child: Row(
+                  children: [
+                    if (_normalface != null)
+                      Image.memory(
+                        _normalface!,
+                        height: 100,
                       ),
-                      child: Text(
-                        scannedText,
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: typeDetection == TypeDetection.faces
-                                ? () {
-                                    setState(() {
-                                      typeDetection = TypeDetection.text;
-                                    });
-                                  }
-                                : null,
-                            child: const Text('Text'),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 16,
-                        ),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: typeDetection == TypeDetection.text
-                                ? () {
-                                    setState(() {
-                                      typeDetection = TypeDetection.faces;
-                                    });
-                                  }
-                                : null,
-                            child: const Text('Faces'),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                ],
+                    if (_smilerface != null)
+                      Image.memory(
+                        _smilerface!,
+                        height: 100,
+                      )
+                  ],
+                ),
               ),
             ),
-            // if (lastSelected != null)
-            //   SizedBox(
-            //     width: 200,
-            //     height: 200,
-            //     child: Image.memory(lastSelected!.planes[0].bytes),
-            //   )
           ],
         );
       }),
@@ -182,7 +177,10 @@ class _FaceScanPageState extends State<FaceScanPage> {
     setState(() {});
   }
 
-  Future _processFace(InputImage inputImage,CameraImage camImage) async {
+  Future _processFace(InputImage inputImage, CameraImage camImage) async {
+    if (allImagesCapturated) {
+      return;
+    }
     final faces = await _faceDetector.processImage(inputImage);
     if (inputImage.inputImageData?.size != null &&
         inputImage.inputImageData?.imageRotation != null) {
@@ -192,23 +190,52 @@ class _FaceScanPageState extends State<FaceScanPage> {
       //   inputImage.inputImageData!.imageRotation,
       // );
       // _customPaint = CustomPaint(painter: painter);
-      if (faces.isNotEmpty) {
+      if (faces.length == 1) {
+        var face = faces.first;
         // scannedText = 'Smile: ${faces.first.smilingProbability}';
-        double faceWidth = faces.first.boundingBox.size.width;
+        double faceWidth = face.boundingBox.size.width;
         bool distanceOk = false;
         bool centerOk = false;
         if (faceWidth > faceSizeAccepeted && faceWidth < faceMaxSizeAccepeted) {
           distanceOk = true;
         }
 
-        if (centerRect.contains(faces.first.boundingBox.center)) {
+        if (centerRect.contains(face.boundingBox.center)) {
           centerOk = true;
         }
+
+        if (faceWidth < faceSizeAccepeted) {
+          description = 'Aproxime mais o rosto';
+        } else if (faceWidth > faceMaxSizeAccepeted) {
+          description = 'Afaste mais o rosto';
+        } else if (!centerOk) {
+          description = 'Centralize seu rosto na marcação';
+        } else {
+          description = '';
+        }
+
+        bool isSmiling = (face.smilingProbability ?? 0.0) > 0.9;
+
         scannedText =
             'DISTANCIA: ${distanceOk ? 'SIM' : 'NÃO'}\nCENTRO: ${centerOk ? 'SIM' : 'NÃO'}\nSmile: ${faces.first.smilingProbability}';
 
         if (centerOk && distanceOk) {
-          lastSelected = camImage;
+          if (_normalface == null) {
+            _normalface = await convertYUV420toImageColor(
+              camImage,
+              inputImage.inputImageData!.imageRotation,
+              flipHorizontal: true,
+            );
+            title = 'Sorria!';
+          } else if (_smilerface == null && isSmiling) {
+            _smilerface = await convertYUV420toImageColor(
+              camImage,
+              inputImage.inputImageData!.imageRotation,
+              flipHorizontal: true,
+            );
+            title = 'Tudo pronto! Obrigado!';
+            allImagesCapturated = true;
+          }
         }
       } else {
         scannedText = '';
@@ -237,12 +264,4 @@ class _FaceScanPageState extends State<FaceScanPage> {
   //   }
   // }
 
-  String _getTitle() {
-    switch (typeDetection) {
-      case TypeDetection.text:
-        return 'Scanning text';
-      case TypeDetection.faces:
-        return 'Scanning faces';
-    }
-  }
 }
