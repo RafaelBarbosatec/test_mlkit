@@ -8,8 +8,6 @@ import 'package:living_check/util/frame_painter.dart';
 import 'package:living_check/util/image_converter.dart';
 import 'package:living_check/widgets/mlkit_camera_preview.dart';
 
-enum TypeDetection { text, faces }
-
 class FaceScanPage extends StatefulWidget {
   const FaceScanPage({super.key});
 
@@ -23,7 +21,6 @@ class _FaceScanPageState extends State<FaceScanPage> {
   String description = '';
   final FaceDetector _faceDetector = FaceDetector(
     options: FaceDetectorOptions(
-      enableContours: true,
       enableClassification: true,
     ),
   );
@@ -38,6 +35,9 @@ class _FaceScanPageState extends State<FaceScanPage> {
   Uint8List? _smilerface;
 
   bool allImagesCapturated = false;
+
+  bool distanceOk = false;
+  bool centerOk = false;
 
   @override
   void dispose() {
@@ -95,6 +95,7 @@ class _FaceScanPageState extends State<FaceScanPage> {
               painter: FramePainter(
                 frameFaceRect,
                 BorderRadius.circular(faceFrameSize),
+                strokeColor: distanceOk && centerOk ? Colors.green : Colors.red,
               ),
             ),
             Align(
@@ -167,8 +168,8 @@ class _FaceScanPageState extends State<FaceScanPage> {
         var face = faces.first;
         // scannedText = 'Smile: ${faces.first.smilingProbability}';
         double faceWidth = face.boundingBox.size.width;
-        bool distanceOk = false;
-        bool centerOk = false;
+        distanceOk = false;
+        centerOk = false;
         if (faceWidth > faceSizeAccepeted && faceWidth < faceMaxSizeAccepeted) {
           distanceOk = true;
         }

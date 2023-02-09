@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 class FramePainter extends CustomPainter {
   final Rect rect;
   final BorderRadius borderRadius;
+  final Color strokeColor;
 
   final backgroundColor = Colors.black.withOpacity(0.5);
 
-  FramePainter(this.rect, this.borderRadius);
+  FramePainter(this.rect, this.borderRadius, {this.strokeColor = Colors.red});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -21,14 +22,13 @@ class FramePainter extends CustomPainter {
         borderRadius.resolve(TextDirection.ltr).toRRect(rect);
     paintFill = Paint()
       ..style = PaintingStyle.fill
-      ..strokeWidth = 4
       ..blendMode = BlendMode.clear;
     canvas.drawRRect(borderRect, paintFill);
 
     paintStroke = Paint()
-      ..color = Colors.red.withOpacity(0.25)
+      ..color = strokeColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 4;
+      ..strokeWidth = 3;
     canvas.drawRRect(borderRect, paintStroke);
   }
 
