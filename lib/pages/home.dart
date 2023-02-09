@@ -7,11 +7,22 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: ElevatedButton(
-          child: const Text('Start flow'),
-          onPressed: () {
-            Navigator.pushNamed(context, '/face');
-          },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton(
+              child: const Text('Start scan face'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/face');
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Start scan document'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/document');
+              },
+            ),
+          ],
         ),
       ),
     );

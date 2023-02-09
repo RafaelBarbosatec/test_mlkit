@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:living_check/pages/document_scan.dart';
 import 'package:living_check/pages/face_scan.dart';
 import 'package:living_check/pages/home.dart';
 
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const HomePage(),
         '/face': (context) => const FaceScanPage(),
+        '/document': (context) => const DocumentScanPage(),
       },
     );
   }

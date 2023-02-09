@@ -188,18 +188,18 @@ class _FaceScanPageState extends State<FaceScanPage> {
     );
   }
 
-  Future _processText(InputImage inputImage) async {
-    RecognizedText recognisedText = await _textRecognizer.processImage(
-      inputImage,
-    );
-    scannedText = "";
-    for (TextBlock block in recognisedText.blocks) {
-      for (TextLine line in block.lines) {
-        scannedText = "${scannedText + line.text}\n";
-      }
-    }
-    setState(() {});
-  }
+  // Future _processText(InputImage inputImage) async {
+  //   RecognizedText recognisedText = await _textRecognizer.processImage(
+  //     inputImage,
+  //   );
+  //   scannedText = "";
+  //   for (TextBlock block in recognisedText.blocks) {
+  //     for (TextLine line in block.lines) {
+  //       scannedText = "${scannedText + line.text}\n";
+  //     }
+  //   }
+  //   setState(() {});
+  // }
 
   Future _processFace(InputImage inputImage, CameraImage camImage) async {
     if (allImagesCapturated) {
