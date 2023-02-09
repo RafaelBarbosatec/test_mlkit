@@ -4,8 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:living_check/util/face_frame_painter.dart';
+import 'package:living_check/util/frame_painter.dart';
 import 'package:living_check/util/image_converter.dart';
 import 'package:living_check/widgets/mlkit_camera_preview.dart';
 
@@ -22,17 +21,12 @@ class _FaceScanPageState extends State<FaceScanPage> {
   String scannedText = "";
   String title = 'Escaneando rosto';
   String description = '';
-  CustomPaint? _customPaint;
   final FaceDetector _faceDetector = FaceDetector(
     options: FaceDetectorOptions(
       enableContours: true,
       enableClassification: true,
     ),
   );
-
-  final _textRecognizer = TextRecognizer();
-
-  TypeDetection typeDetection = TypeDetection.text;
 
   double faceFrameSize = 0;
   double faceSizeAccepeted = 400;
@@ -48,7 +42,6 @@ class _FaceScanPageState extends State<FaceScanPage> {
   @override
   void dispose() {
     _faceDetector.close();
-    _textRecognizer.close();
     super.dispose();
   }
 
@@ -57,7 +50,7 @@ class _FaceScanPageState extends State<FaceScanPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text("Text Recognition example"),
+        title: const Text("Face Scan"),
       ),
       body: LayoutBuilder(builder: (context, constrant) {
         return Stack(
@@ -98,9 +91,8 @@ class _FaceScanPageState extends State<FaceScanPage> {
                 });
               },
             ),
-
             CustomPaint(
-              painter: FaceFramePainter(
+              painter: FramePainter(
                 frameFaceRect,
                 BorderRadius.circular(faceFrameSize),
               ),
@@ -131,36 +123,6 @@ class _FaceScanPageState extends State<FaceScanPage> {
                 ),
               ),
             ),
-            // Center(
-            //   child: Container(
-            //     width: faceFrameSize,
-            //     height: faceFrameSize * 1.4,
-            //     decoration: BoxDecoration(
-            //         border: Border.all(color: Colors.red),
-            //         borderRadius: BorderRadius.circular(faceFrameSize)),
-            //   ),
-            // ),
-            // if (_customPaint != null) _customPaint!,
-            // Align(
-            //   alignment: Alignment.bottomCenter,
-            //   child: Column(
-            //     mainAxisSize: MainAxisSize.min,
-            //     children: [
-            //       if (scannedText.isNotEmpty)
-            //         Container(
-            //           padding: const EdgeInsets.all(16),
-            //           decoration: BoxDecoration(
-            //             color: Colors.white.withOpacity(0.5),
-            //             borderRadius: BorderRadius.circular(20),
-            //           ),
-            //           child: Text(
-            //             scannedText,
-            //             style: const TextStyle(fontSize: 20),
-            //           ),
-            //         ),
-            //     ],
-            //   ),
-            // ),
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
@@ -187,19 +149,6 @@ class _FaceScanPageState extends State<FaceScanPage> {
       }),
     );
   }
-
-  // Future _processText(InputImage inputImage) async {
-  //   RecognizedText recognisedText = await _textRecognizer.processImage(
-  //     inputImage,
-  //   );
-  //   scannedText = "";
-  //   for (TextBlock block in recognisedText.blocks) {
-  //     for (TextLine line in block.lines) {
-  //       scannedText = "${scannedText + line.text}\n";
-  //     }
-  //   }
-  //   setState(() {});
-  // }
 
   Future _processFace(InputImage inputImage, CameraImage camImage) async {
     if (allImagesCapturated) {
@@ -269,23 +218,9 @@ class _FaceScanPageState extends State<FaceScanPage> {
       for (final face in faces) {
         scannedText += 'face: ${face.boundingBox}\n\n';
       }
-
-      _customPaint = null;
     }
     if (mounted) {
       setState(() {});
     }
   }
-
-  // Future<void> _imageCallback(InputImage imag, CameraImage camImg) async {
-  //   switch (typeDetection) {
-  //     case TypeDetection.text:
-  //       await _processText(image);
-  //       break;
-  //     case TypeDetection.faces:
-  //       await _processFace(image,camImg);
-  //       break;
-  //   }
-  // }
-
 }

@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
-import 'package:google_mlkit_commons/src/input_image.dart';
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as imglib;
 
 const shift = (0xFF << 24);
@@ -61,7 +61,9 @@ Future<Uint8List?> convertYUV420toImageColor(
     // muteYUVProcessing = false;
     return Uint8List.fromList(png);
   } catch (e) {
-    print(">>>>>>>>>>>> ERROR:$e");
+    if (kDebugMode) {
+      print(">>>>>>>>>>>> ERROR:$e");
+    }
   }
   return null;
 }

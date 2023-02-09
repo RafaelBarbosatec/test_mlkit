@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class FaceFramePainter extends CustomPainter {
+class FramePainter extends CustomPainter {
   final Rect rect;
   final BorderRadius borderRadius;
 
   final backgroundColor = Colors.black.withOpacity(0.5);
 
-  FaceFramePainter(this.rect, this.borderRadius);
+  FramePainter(this.rect, this.borderRadius);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -33,5 +33,5 @@ class FaceFramePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(FaceFramePainter oldDelegate) => false;
+  bool shouldRepaint(FramePainter oldDelegate) => false;
 }
