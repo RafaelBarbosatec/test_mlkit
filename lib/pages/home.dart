@@ -16,12 +16,12 @@ class HomePage extends StatelessWidget {
                 Navigator.pushNamed(context, '/face');
               },
             ),
-            // ElevatedButton(
-            //   child: const Text('Start scan document'),
-            //   onPressed: () {
-            //     Navigator.pushNamed(context, '/document');
-            //   },
-            // ),
+            ElevatedButton(
+              child: const Text('Start scan document'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/document');
+              },
+            ),
           ],
         ),
       ),

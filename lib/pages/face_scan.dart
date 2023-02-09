@@ -126,9 +126,8 @@ class _FaceScanPageState extends State<FaceScanPage> {
             ),
             Align(
               alignment: Alignment.bottomCenter,
-              child: Container(
+              child: SizedBox(
                 height: 100,
-                margin: const EdgeInsets.only(bottom: 100),
                 child: Row(
                   children: [
                     if (_normalface != null)
